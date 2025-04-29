@@ -1,57 +1,79 @@
 <template>
   <Navbar />
-  <div v-for="(idol, i) in idols" :key="i">
-    <figure>
-      <img :src="idol.src" alt="프사">
-      </figure>
-    <h3 class="infoTitle" :style="idol.fontColor">{{ idol.title }}</h3>
-    <p>사장: {{ idol.owner }}</p>
-    <p>회사: {{ idol.company }}</p>
-    <span>좋아요 수: {{idol.like }} -</span>
-    <button @click="increseLike(idol)">좋아요</button>
-    <p>
-      <button @click="handleModal(i);">상세보기</button>
-    </p>
-  </div>
-
-  <Modal :idols="idols" :isModal="isModal" :selected="selected" :handleModal="handleModal"/>
+  <Event text="상단 이벤트 bar" />
+  <SearchBar :idols="idol_temp" @searchMovie="searchMovie" />
+  <p>
+    <button @click="allSearchMovie">전체보기</button>
+  </p>
+  <Idols
+    :idols="idol_temp"
+    :increseLike="increseLike"
+    :handleModal="handleModal"
+    @emitTest="emitTest"
+  />
+  <Modal
+    :idols="idols"
+    :isModal="isModal"
+    :selected="selected"
+    :handleModal="handleModal"
+  />
 </template>
 
 <script>
 import datas from "./assets/idols.js";
 import Navbar from "./components/Navbar.vue";
 import Modal from "./components/Modal.vue";
-
+import Idols from "./components/Idols.vue";
+import Event from "./components/Event.vue";
+import SearchBar from "./components/SearchBar.vue";
 export default {
   name: "App",
   data() {
-   return {
-    isModal: false,
-    idols:datas,
-    selected:0
-  }
+    return {
+      isModal: false,
+      idols: datas,
+      idol_temp: [...datas],
+      selected: 0,
+    };
   },
   methods: {
-    increseLike(idol){
+    increseLike(idol) {
       idol.like++;
     },
 
-    handleModal(i){
+    handleModal(i) {
       this.isModal = !this.isModal;
       this.selected = i;
-    }
-  },
-  components:{
-    Navbar: Navbar,
-    Modal: Modal
-  }
+    },
 
-}
+    emitTest() {
+      this.idols[0].like++;
+    },
+
+    searchMovie(title) {
+      //첫번쨰 매개변수는 입력된값, 두번째는 이전값
+      //제목에 데이터에 있는지 확인 데이터이름과 동일하게 적어주면됨\
+
+      const idol = this.idols.filter((idol) => {
+        return idol.title.includes(title);
+      });
+      if (idol.length == 0) {
+        alert("자료없음");
+      }
+      this.idol_temp = idol;
+    },
+    allSearchMovie() {
+      this.idol_temp = [...this.idols];
+    },
+  },
+  components: {
+    Navbar: Navbar,
+    Modal: Modal,
+    Idols: Idols,
+    Event: Event,
+    SearchBar: SearchBar,
+  },
+};
 </script>
 
-<style>
-.infoTitle{
-  background-color: yellow;
-}
-
-</style>
+<style></style>
